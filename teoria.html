@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpidemiaDigital - Fundamentos EDO</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- Estilos Locales -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barra de Navegación Premium -->
+        <nav class="navbar">
+            <div class="nav-title">
+                <i class="fa-solid fa-virus-covid logo-icon"></i>
+                <div class="nav-title-text">
+                    <h1>EpidemiaDigital</h1>
+                    <p>Simula brotes informáticos con el modelo compartimental SIR en red</p>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">
+                    <i class="fa-solid fa-network-wired"></i> Simulación
+                </a>
+                <a href="teoria.html" class="nav-link active">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentos EDO
+                </a>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal (Teoría) -->
+        <main class="main-content">
+            <section class="math-section card-glass">
+                <div class="math-content">
+                    <h2>Modelo SIR (Susceptibles - Infectados - Recuperados) en Redes</h2>
+                    
+                    <div class="math-block">
+                        <h3><span class="step-num">1</span>El Sistema de Ecuaciones Diferenciales</h3>
+                        <p>El modelo SIR es un modelo compartimental propuesto originalmente por Kermack y McKendrick (1927) para epidemias biológicas, pero adaptado a la informática para modelar gusanos que se replican automáticamente en redes locales. El sistema dinámico está regido por tres EDOs acopladas no lineales:</p>
+                        <div class="math-formula">
+                            $$\begin{aligned}
+                            \frac{dS}{dt} &= -\beta \cdot S \cdot I \\
+                            \frac{dI}{dt} &= \beta \cdot S \cdot I - \gamma \cdot I \\
+                            \frac{dR}{dt} &= \gamma \cdot I
+                            \end{aligned}$$
+                        </div>
+                        <p>Donde la población total se conserva constante: $N = S(t) + I(t) + R(t)$, por lo que la derivada de la población total es nula: $\frac{dS}{dt} + \frac{dI}{dt} + \frac{dR}{dt} = 0$.</p>
+                    </div>
+
+                    <div class="math-block">
+                        <h3><span class="step-num">2</span>Significado Físico de los Parámetros</h3>
+                        <ul>
+                            <li><strong>Susceptibles ($S$)</strong>: Computadoras sanas en la red que no tienen instalados parches de seguridad contra el exploit y pueden ser infectadas.</li>
+                            <li><strong>Infectados ($I$)</strong>: Computadoras ejecutando el código malicioso que buscan propagarse en la red escaneando puertos o enviando correos.</li>
+                            <li><strong>Recuperados ($R$)</strong>: Computadoras que han sido desconectadas, formateadas o a las que se les ha aplicado el parche de actualización (inmunidad digital).</li>
+                            <li><strong>Tasa de transmisión ($\beta$)</strong>: Probabilidad de contagio al conectarse dos equipos. En gusanos tipo WannaCry es extremadamente alta por explotar vulnerabilidades de red directa (EternalBlue).</li>
+                            <li><strong>Tasa de recuperación ($\gamma$)</strong>: Fracción de nodos infectados que son curados por unidad de tiempo. $\frac{1}{\gamma}$ representa el tiempo promedio que se tarda en aislar o parchar un nodo infectado.</li>
+                        </ul>
+                    </div>
+
+                    <div class="math-block">
+                        <h3><span class="step-num">3</span>El Número de Reproducción Básico ($R_0$)</h3>
+                        <p>Un concepto fundamental en epidemiología es el número de reproducción básico, definido como:</p>
+                        <div class="math-formula">
+                            $$R_0 = \frac{\beta \cdot S_0}{\gamma}$$
+                        </div>
+                        <p>Este valor indica a cuántos equipos infectará un único nodo infectado en una red compuesta inicialmente por $S_0$ susceptibles. La dinámica se comporta de la siguiente manera:</p>
+                        <ul>
+                            <li>Si $R_0 > 1$, la epidemia se expande, alcanzando un pico de contagio y saturando la red.</li>
+                            <li>Si $R_0 \le 1$, la tasa de recuperación supera la tasa de contagio y el virus se extingue sin causar un brote masivo.</li>
+                        </ul>
+                        <p>En el simulador, al modificar los sliders de $\beta$ y $\gamma$, puedes observar cómo la forma de las curvas cambia drásticamente dependiendo de si superas este umbral crítico.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpidemiaDigital - Modelo SIR de Virus Informáticos</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Estilos Locales -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barra de Navegación Premium -->
+        <nav class="navbar">
+            <div class="nav-title">
+                <i class="fa-solid fa-virus-covid logo-icon"></i>
+                <div class="nav-title-text">
+                    <h1>EpidemiaDigital</h1>
+                    <p>Simula brotes informáticos con el modelo compartimental SIR en red</p>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">
+                    <i class="fa-solid fa-network-wired"></i> Simulación
+                </a>
+                <a href="teoria.html" class="nav-link">
+                    <i class="fa-solid fa-graduation-cap"></i> Fundamentos EDO
+                </a>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <div class="grid-layout">
+                <!-- Columna de Controles -->
+                <div class="control-panel card-glass">
+                    <div class="panel-header">
+                        <h2>Controles del Brote</h2>
+                        <p>Ajusta el comportamiento de propagación del virus en tiempo real.</p>
+                    </div>
+
+                    <!-- Selección de Virus -->
+                    <div class="input-group">
+                        <label for="virus-preset">Virus Famoso / Preajuste</label>
+                        <div class="select-wrapper">
+                            <select id="virus-preset" onchange="loadVirusPreset()">
+                                <option value="wannacry" selected>🪲 WannaCry (2017)</option>
+                                <option value="melissa">📧 Melissa (1999)</option>
+                                <option value="iloveyou">❤️ ILOVEYOU (2000)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Descripción del Virus -->
+                    <p class="virus-description" id="virus-desc-text">
+                        Cargando información histórica...
+                    </p>
+                    
+                    <!-- Tasa de Infección Beta -->
+                    <div class="input-group">
+                        <div class="label-val">
+                            <label for="param-beta">Tasa de Contagio (β)</label>
+                            <span class="val-display" id="val-beta">0.0050</span>
+                        </div>
+                        <input type="range" id="param-beta" min="0.0005" max="0.015" value="0.005" step="0.0005" oninput="updateSimulation()">
+                        <span class="input-helper">Probabilidad de transmisión del malware por equipo infectado conectado.</span>
+                    </div>
+
+                    <!-- Tasa de Recuperación Gamma -->
+                    <div class="input-group">
+                        <div class="label-val">
+                            <label for="param-gamma">Tasa de Parcheo (γ)</label>
+                            <span class="val-display" id="val-gamma">0.080</span>
+                        </div>
+                        <input type="range" id="param-gamma" min="0.01" max="0.40" value="0.08" step="0.01" oninput="updateSimulation()">
+                        <span class="input-helper">Tasa de equipos infectados que son curados, formateados o parcheados al día.</span>
+                    </div>
+
+                    <!-- Tamaño de Red N -->
+                    <div class="input-group">
+                        <div class="label-val">
+                            <label for="param-nodes">Total de Equipos en Red (N)</label>
+                            <span class="val-display" id="val-nodes">100</span>
+                        </div>
+                        <input type="range" id="param-nodes" min="50" max="150" value="100" step="10" oninput="changeNetworkSize()">
+                        <span class="input-helper">Total de computadoras vulnerables conectadas en la red de pruebas.</span>
+                    </div>
+
+                    <!-- Botones de Acción de Tiempo -->
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="btn-play" onclick="togglePlay()">
+                            <i class="fa-solid fa-pause" id="play-icon"></i> <span id="play-text">Pausar Tiempo</span>
+                        </button>
+                        <button class="btn-secondary" onclick="resetAnimation()">
+                            <i class="fa-solid fa-rotate-left"></i> Reiniciar
+                        </button>
+                    </div>
+
+                    <!-- Selector de Velocidad -->
+                    <div class="speed-control">
+                        <span>Velocidad:</span>
+                        <div class="speed-buttons">
+                            <button class="speed-btn active" id="speed-1x" onclick="setSpeed(1)">1x</button>
+                            <button class="speed-btn" id="speed-5x" onclick="setSpeed(5)">5x</button>
+                            <button class="speed-btn" id="speed-15x" onclick="setSpeed(15)">15x</button>
+                        </div>
+                    </div>
+
+                    <!-- Tarjetas de Información Instantánea -->
+                    <div class="stats-grid">
+                        <div class="stat-card stat-card-s">
+                            <span class="stat-label">Susceptibles (S)</span>
+                            <span class="stat-value" id="stat-s">99</span>
+                        </div>
+                        <div class="stat-card stat-card-i">
+                            <span class="stat-label">Infectados (I)</span>
+                            <span class="stat-value" id="stat-i">1</span>
+                        </div>
+                        <div class="stat-card stat-card-r">
+                            <span class="stat-label">Parcheados (R)</span>
+                            <span class="stat-value" id="stat-r">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna del Visualizador (Red de Nodos y Bitácora) -->
+                <div class="visualizer-card card-glass">
+                    <div class="visualizer-card-header">
+                        <h2>Monitor de Computadoras</h2>
+                        <span class="status-badge" id="virus-status-badge">
+                            Brote Activo 🔥
+                        </span>
+                    </div>
+                    <p class="input-helper">Los círculos representan computadoras y sus conexiones en red.</p>
+                    
+                    <div class="visualizer-body">
+                        <!-- Red de Computadoras -->
+                        <div class="network-container">
+                            <div class="network-grid" id="network-grid-element">
+                                <!-- Generado por JS -->
+                            </div>
+                        </div>
+
+                        <!-- Cronología Narrativa (Bitácora de Incidentes) -->
+                        <div class="timeline-narrative" id="narrative-card">
+                            <div class="narrative-header">
+                                <span class="narrative-title">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Bitácora del Brote
+                                </span>
+                                <span class="narrative-badge" id="narrative-day-label">Día 0</span>
+                            </div>
+                            <p class="narrative-text" id="narrative-day-desc">
+                                El virus ha comenzado a propagarse en la red local.
+                            </p>
+                        </div>
+
+                        <!-- Scrubber Temporal -->
+                        <div class="scrubber-container">
+                            <input type="range" id="animation-scrubber" min="0" max="30" value="0" step="1" oninput="scrubTime(this.value)">
+                            <div class="scrubber-labels">
+                                <span>Inicio (Día 0)</span>
+                                <span id="scrubber-current-time">Día Seleccionado: 0</span>
+                                <span>Límite (Día 30)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico SIR (A lo ancho) -->
+                <div class="chart-card card-glass">
+                    <h2>Curvas de Transmisión Epidémica (SIR)</h2>
+                    <p class="input-helper">Evolución compartimental de equipos Susceptibles, Infectados y Recuperados.</p>
+                    <div class="chart-container">
+                        <canvas id="sirChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Cargar JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
